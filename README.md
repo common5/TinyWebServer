@@ -1,2 +1,2 @@
 TinyWebServer
-origined from https://github.com/qinguoyi/TinyWebServer.git
+originated from https://github.com/qinguoyi/TinyWebServer.git
