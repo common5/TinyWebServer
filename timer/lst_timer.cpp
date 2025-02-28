@@ -99,7 +99,7 @@ void sort_timer_lst::tick()
     {
         return;
     }
-    
+
     time_t cur = time(NULL);
     util_timer *tmp = head;
     while (tmp)
@@ -150,7 +150,7 @@ void Utils::init(int timeslot)
     m_TIMESLOT = timeslot;
 }
 
-//对文件描述符设置非阻塞
+// 对文件描述符设置非阻塞
 int Utils::setnonblocking(int fd)
 {
     int old_option = fcntl(fd, F_GETFL);
@@ -159,34 +159,34 @@ int Utils::setnonblocking(int fd)
     return old_option;
 }
 
-//将内核事件表注册读事件，ET模式，选择开启EPOLLONESHOT
+// 将内核事件表注册读事件，ET模式(TRIGMODE = 1)，选择开启EPOLLONESHOT(one_shot = true)
 void Utils::addfd(int epollfd, int fd, bool one_shot, int TRIGMode)
 {
     epoll_event event;
     event.data.fd = fd;
 
     if (1 == TRIGMode)
-        event.events = EPOLLIN | EPOLLET | EPOLLRDHUP;
+        event.events = EPOLLIN | EPOLLET | EPOLLRDHUP; // 监听fd可读 | 边缘触发模式 | 对端关闭写端
     else
         event.events = EPOLLIN | EPOLLRDHUP;
 
     if (one_shot)
         event.events |= EPOLLONESHOT;
-    epoll_ctl(epollfd, EPOLL_CTL_ADD, fd, &event);
-    setnonblocking(fd);
+    epoll_ctl(epollfd, EPOLL_CTL_ADD, fd, &event); // 将fd添加到epollfd的监听列表中, event表示了epollfd要监听的事件
+    setnonblocking(fd);                            // 将fd设置为非阻塞
 }
 
-//信号处理函数
+// 信号处理函数
 void Utils::sig_handler(int sig)
 {
-    //为保证函数的可重入性，保留原来的errno
+    // 为保证函数的可重入性，保留原来的errno
     int save_errno = errno;
     int msg = sig;
     send(u_pipefd[1], (char *)&msg, 1, 0);
     errno = save_errno;
 }
 
-//设置信号函数
+// 设置信号函数
 void Utils::addsig(int sig, void(handler)(int), bool restart)
 {
     struct sigaction sa;
@@ -198,7 +198,7 @@ void Utils::addsig(int sig, void(handler)(int), bool restart)
     assert(sigaction(sig, &sa, NULL) != -1);
 }
 
-//定时处理任务，重新定时以不断触发SIGALRM信号
+// 定时处理任务，重新定时以不断触发SIGALRM信号
 void Utils::timer_handler()
 {
     m_timer_lst.tick();
