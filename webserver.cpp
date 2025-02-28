@@ -353,19 +353,23 @@ void WebServer::dealwithwrite(int sockfd)
 
         m_pool->append(users + sockfd, 1);
 
-        while (true)
-        {
-            if (1 == users[sockfd].improv)
-            {
-                if (1 == users[sockfd].timer_flag)
-                {
-                    deal_timer(timer, sockfd);
-                    users[sockfd].timer_flag = 0;
-                }
-                users[sockfd].improv = 0;
-                break;
-            }
-        }
+        // while (true)
+        // {
+        //     if (1 == users[sockfd].improv)
+        //     {
+        //         if (1 == users[sockfd].timer_flag)
+        //         {
+        //             deal_timer(timer, sockfd);
+        //             users[sockfd].timer_flag = 0;
+        //         }
+        //         users[sockfd].improv = 0;
+        //         break;
+        //     }
+        // }
+        release_queue_lock.lock(); // 需要上锁
+        release_queue.push(make_pair(timer, sockfd));
+        release_queue_cond.signal(); // 需注意只能通知一个（因为只插入了一个...，不过除了主线程外仅有一个线程会获取该cond，其实无所谓）
+        release_queue_lock.unlock();
     }
     else
     {
