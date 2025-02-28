@@ -86,7 +86,6 @@ public:
     int timer_flag;
     int improv;
 
-
 private:
     void init();
     HTTP_CODE process_read();
@@ -111,13 +110,13 @@ public:
     static int m_epollfd;
     static int m_user_count;
     MYSQL *mysql;
-    int m_state;  //读为0, 写为1
+    int m_state; // 读为0, 写为1
 
 private:
     int m_sockfd;
     sockaddr_in m_address;
     char m_read_buf[READ_BUFFER_SIZE];
-    long m_read_idx;
+    long m_read_idx; // 已经读入的字节数
     long m_checked_idx;
     int m_start_line;
     char m_write_buf[WRITE_BUFFER_SIZE];
@@ -134,8 +133,8 @@ private:
     struct stat m_file_stat;
     struct iovec m_iv[2];
     int m_iv_count;
-    int cgi;        //是否启用的POST
-    char *m_string; //存储请求头数据
+    int cgi;        // 是否启用的POST
+    char *m_string; // 存储请求头数据
     int bytes_to_send;
     int bytes_have_send;
     char *doc_root;
