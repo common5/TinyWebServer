@@ -42,6 +42,7 @@ void WebServer::init(int port, string user, string passWord, string databaseName
     m_TRIGMode = trigmode;
     m_close_log = close_log;
     m_actormodel = actor_model;
+    pthread_create(&release_thread, NULL, release_worker, this);
 }
 
 void WebServer::trig_mode()
@@ -295,20 +296,27 @@ void WebServer::dealwithread(int sockfd)
         // 若监测到读事件，将该事件放入请求队列
         m_pool->append(users + sockfd, 0);
 
-        // 循环检测工作线程是否处理完成
-        while (true)
-        {
-            if (1 == users[sockfd].improv)
-            {
-                if (1 == users[sockfd].timer_flag)
-                {
-                    deal_timer(timer, sockfd);
-                    users[sockfd].timer_flag = 0;
-                }
-                users[sockfd].improv = 0;
-                break;
-            }
-        }
+        // // 循环检测工作线程是否处理完成
+        // while (true)
+        // {
+        //     if (1 == users[sockfd].improv)
+        //     {
+        //         if (1 == users[sockfd].timer_flag)
+        //         {
+        //             deal_timer(timer, sockfd);
+        //             users[sockfd].timer_flag = 0;
+        //         }
+        //         users[sockfd].improv = 0;
+        //         break;
+        //     }
+        // }
+
+        // 使用一个线程专门检查工作线程处理情况
+        // 只需要将timer和sockfd传递给release_queue即可
+        release_queue_lock.lock(); // 需要上锁
+        release_queue.push(make_pair(timer, sockfd));
+        release_queue_cond.signal(); // 需注意只能通知一个（因为只插入了一个...，不过除了主线程外仅有一个线程会获取该cond，其实无所谓）
+        release_queue_lock.unlock();
     }
     else
     {

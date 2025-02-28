@@ -16,6 +16,7 @@ public:
     threadpool(int actor_model, connection_pool *connPool, int thread_number = 8, int max_request = 10000);
     ~threadpool();
     bool append(T *request, int state);
+    // bool append(T *request, int state, int sockfd);
     bool append_p(T *request);
 
 private:
