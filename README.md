@@ -2,7 +2,7 @@ TinyWebServer
 originated from https://github.com/qinguoyi/TinyWebServer.git
 
 
-上传文件功能, 待完成
+上传文件功能, 已完成，支持MB级别的文件上传
 
 一个Linux下的C++轻量级Web服务器
 使用线程池 + 非阻塞socket + epoll(ET和LT均实现) + 事件处理(Reactor和模拟Proactor均实现)的并发模型
